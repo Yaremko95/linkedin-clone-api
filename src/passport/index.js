@@ -4,7 +4,7 @@ const passportJWT = require("passport-jwt");
 const JWTStrategy = passportJWT.Strategy;
 const User = require("../db").User;
 const jwt = require('jsonwebtoken')
-
+const ExtractJwt = require('passport-jwt').ExtractJwt;
 
 
 const authenticate = async (user) => {
@@ -58,14 +58,7 @@ passport.use(
 passport.use(
     new JWTStrategy(
         {
-            jwtFromRequest: function (req) {
-                let token = null;
-
-                if (req && req.cookies) {
-                    token = req.cookies["accessToken"];
-                }
-                return token;
-            },
+            jwtFromRequest:ExtractJwt.fromAuthHeaderAsBearerToken(),
             secretOrKey: process.env["JWT_SECRET"],
         },
         async function (jwtPayload, cb) {
