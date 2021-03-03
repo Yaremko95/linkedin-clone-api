@@ -23,9 +23,20 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         // unique: true,
       },
+      socketId: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: "",
+        // unique: true,
+      },
+
       password: {
         type: DataTypes.STRING,
         allowNull: true,
+      },
+      status: {
+        type: DataTypes.STRING,
+        defaultValue: "offline",
       },
       refresh_tokens: {
         type: DataTypes.ARRAY(DataTypes.STRING),
@@ -35,22 +46,27 @@ module.exports = (sequelize, DataTypes) => {
       role: {
         type: DataTypes.STRING,
         allowNull: true,
+        defaultValue: "",
       },
       imgUrl: {
         type: DataTypes.STRING,
         allowNull: true,
+        defaultValue: "",
       },
       about: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: true,
+        defaultValue: "",
       },
       country: {
         type: DataTypes.STRING,
         allowNull: true,
+        defaultValue: "",
       },
       city: {
         type: DataTypes.STRING,
         allowNull: true,
+        defaultValue: "",
       },
       fullName: {
         type: DataTypes.VIRTUAL,
@@ -98,6 +114,13 @@ module.exports = (sequelize, DataTypes) => {
     User.hasMany(models.Post);
     User.hasMany(models.Reaction);
     User.hasMany(models.Comment);
+    User.hasMany(models.Conversation, { foreignKey: "userId" });
+    User.hasMany(models.Participant);
+    User.belongsToMany(models.Conversation, {
+      through: models.Participant,
+      as: "parts",
+    });
+    User.hasMany(models.Message);
   };
   return User;
 };

@@ -2,6 +2,8 @@ const express = require("express");
 const passport = require("passport");
 const router = express.Router();
 const User = require("../../db/index").User;
+const Experience = require("../../db/index").Experience;
+const Education = require("../../db/index").Education;
 const jwt = require("jsonwebtoken");
 const usersCloudinary = require("../../lib/utils/cloudinary/users");
 // router.post(
@@ -26,7 +28,20 @@ const usersCloudinary = require("../../lib/utils/cloudinary/users");
 //         }
 //     }
 // );
-
+router
+  .route("/")
+  .get(
+    passport.authenticate("jwt", { session: false }),
+    async (req, res, next) => {
+      try {
+        const users = await User.findAll();
+        res.send(users);
+      } catch (e) {
+        console.log(e);
+        res.status(500).send(e);
+      }
+    }
+  );
 router
   .route("/me")
   .get(
@@ -46,11 +61,7 @@ router
           if (!user) {
             return res.status(401).send("no user");
           } else {
-            return res.status(200).send({
-              ...user.dataValues,
-              password: "",
-              refresh_tokens: [],
-            });
+            return res.status(200).send(user);
           }
         }
       )(req, res, next);
@@ -78,7 +89,22 @@ router
       }
     }
   );
-
+router
+  .route("/:userId")
+  .get(
+    passport.authenticate("jwt", { session: false }),
+    async (req, res, next) => {
+      try {
+        const users = await User.findByPk(req.params.userId, {
+          include: [Experience, Education],
+        });
+        res.send(users);
+      } catch (e) {
+        console.log(e);
+        res.status(500).send(e);
+      }
+    }
+  );
 router.route("/signUp").post(async (req, res, next) => {
   try {
     //console.log(req.body);

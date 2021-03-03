@@ -1,43 +1,48 @@
 const { Sequelize, DataTypes } = require("sequelize");
-const User = require('./users')
-const Education = require('./educations')
-const Experience = require('./experiences')
-const Post = require('./posts')
-const Reaction = require('./reactions')
-const Comment = require('./comments')
+const User = require("./users");
+const Education = require("./educations");
+const Experience = require("./experiences");
+const Post = require("./posts");
+const Reaction = require("./reactions");
+const Comment = require("./comments");
+const Conversation = require("./conversations");
+const Message = require("./messages");
+const Participant = require("./participants");
 const bcrypt = require("bcrypt");
 const sequelize = new Sequelize(
-    process.env.PGDATABASE,
-    process.env.PGUSER,
-    process.env.PGPASSWORD,
-    {
-        host: process.env.PGHOST,
-        dialect: "postgres",
-        // dialectOptions: {
-        //   ssl: true,
-        // },
-
-    }
+  process.env.PGDATABASE,
+  process.env.PGUSER,
+  process.env.PGPASSWORD,
+  {
+    host: process.env.PGHOST,
+    dialect: "postgres",
+    // dialectOptions: {
+    //   ssl: true,
+    // },
+  }
 );
 const db = {
-    User:User(sequelize, DataTypes),
-    Education:Education(sequelize, DataTypes),
-    Experience:Experience(sequelize, DataTypes),
-    Post:Post(sequelize, DataTypes),
-    Reaction:Reaction(sequelize, DataTypes),
-    Comment:Comment(sequelize, DataTypes)
+  User: User(sequelize, DataTypes),
+  Education: Education(sequelize, DataTypes),
+  Experience: Experience(sequelize, DataTypes),
+  Post: Post(sequelize, DataTypes),
+  Reaction: Reaction(sequelize, DataTypes),
+  Comment: Comment(sequelize, DataTypes),
+  Conversation: Conversation(sequelize, DataTypes),
+  Message: Message(sequelize, DataTypes),
+  Participant: Participant(sequelize, DataTypes),
 };
 Object.keys(db).forEach((modelName) => {
-    if ("associate" in db[modelName]) {
-        db[modelName].associate(db);
-    }
+  if ("associate" in db[modelName]) {
+    db[modelName].associate(db);
+  }
 });
 
 db.User.prototype.validPassword = async function (password) {
-    return await bcrypt.compare(password, this.password);
+  return await bcrypt.compare(password, this.password);
 };
 
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-module.exports = db
+module.exports = db;
