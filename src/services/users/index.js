@@ -1,5 +1,6 @@
 const express = require("express");
 const passport = require("passport");
+const { Op } = require("sequelize");
 const router = express.Router();
 const User = require("../../db/index").User;
 const Experience = require("../../db/index").Experience;
@@ -34,7 +35,14 @@ router
     passport.authenticate("jwt", { session: false }),
     async (req, res, next) => {
       try {
-        const users = await User.findAll();
+        const { q } = req.query;
+        const users = await User.findAll(
+          q
+            ? {
+                where: { [Op.or]: [{ name: { [Op.iLike]: "%" + q + "%" } }] },
+              }
+            : {}
+        );
         res.send(users);
       } catch (e) {
         console.log(e);
