@@ -66,13 +66,18 @@ const socketHandler = (io) => {
           as: "parts",
           include: [
             { model: Participant, include: User },
-            { model: Message, include: User },
+            {
+              model: Message,
+              include: User,
+              order: [["createdAt", "ASC"]],
+            },
           ],
           through: { attributes: [] },
         },
       });
       console.log(participant);
       const grouped = groupBy(participant.parts, "id");
+      console.log(typeof Object.keys(grouped)[0]);
       socket.emit("conversations", grouped);
       participant.parts.forEach((conversation) => {
         socket.join(conversation.id);
@@ -110,7 +115,7 @@ const socketHandler = (io) => {
         include: [
           { model: User, as: "createdBy" },
           { model: Participant },
-          { model: Message },
+          { model: Message, order: [["createdAt", "ASC"]] },
         ],
       });
 
@@ -135,7 +140,7 @@ const socketHandler = (io) => {
         text,
         conversationId,
       });
-      io.in(conversationId).emit("receiveMsg", newMsg);
+      io.in(conversationId).emit("receiveMsg", { ...newMsg.dataValues, user });
 
       // socket.on("login", async (data) => {
       //   console.log("loggedin");
